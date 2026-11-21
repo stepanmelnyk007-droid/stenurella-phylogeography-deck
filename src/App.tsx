@@ -30,39 +30,46 @@ const SLIDES: SlideMeta[] = [
   { id: 9, shortTitle: '10 · Подяка', section: 'Фінал' },
 ];
 
+type CurtainPhase = 'idle' | 'expand' | 'collapse';
+
 export default function App() {
   const [currentSlide, setCurrentSlide] = useState<number>(0);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
+  const [curtainPhase, setCurtainPhase] = useState<CurtainPhase>('idle');
   const [heroZoomBurst, setHeroZoomBurst] = useState<boolean>(false);
-  const [transitionDirection, setTransitionDirection] = useState<'next' | 'prev'>('next');
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+
+  const isBusy = curtainPhase !== 'idle' || heroZoomBurst;
 
   const navigateTo = useCallback(
     (targetIdx: number) => {
-      if (isTransitioning || targetIdx === currentSlide) return;
+      if (isBusy || targetIdx === currentSlide) return;
       if (targetIdx < 0 || targetIdx >= SLIDES.length) return;
 
-      const dir = targetIdx > currentSlide ? 'next' : 'prev';
-      setTransitionDirection(dir);
-      setIsTransitioning(true);
-
-      // Authentic video_1.mp4 00:07-00:08 zoom burst transition when leaving Title Slide (Slide 0 -> Slide 1)
+      // Slide 0 -> Slide 1: Beetle zoom-in burst + TV curtain collapse reveal
       if (currentSlide === 0 && targetIdx === 1) {
         setHeroZoomBurst(true);
         setTimeout(() => {
           setCurrentSlide(targetIdx);
           setHeroZoomBurst(false);
-          setTimeout(() => setIsTransitioning(false), 380);
-        }, 520);
-      } else {
-        // Laser vertical curtain wipe transition for subsequent slides (mirrors video_1.mp4 00:54)
-        setTimeout(() => {
-          setCurrentSlide(targetIdx);
-          setTimeout(() => setIsTransitioning(false), 360);
-        }, 320);
+          setCurtainPhase('collapse');
+          setTimeout(() => {
+            setCurtainPhase('idle');
+          }, 340);
+        }, 420);
+        return;
       }
+
+      // Authentic TV Vertical Line Expand (320ms) -> Swap Slide -> Collapse back to center beam (340ms)
+      setCurtainPhase('expand');
+      setTimeout(() => {
+        setCurrentSlide(targetIdx);
+        setCurtainPhase('collapse');
+        setTimeout(() => {
+          setCurtainPhase('idle');
+        }, 340);
+      }, 320);
     },
-    [currentSlide, isTransitioning]
+    [currentSlide, isBusy]
   );
 
   const handleNext = useCallback(() => {
@@ -73,7 +80,6 @@ export default function App() {
     navigateTo(currentSlide - 1);
   }, [currentSlide, navigateTo]);
 
-  // Keyboard navigation (ArrowRight, Space, PageDown, ArrowLeft, PageUp)
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
@@ -103,7 +109,7 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-screen bg-[#070D0E] bg-radar-grid text-[#E6ECEB] flex flex-col justify-between overflow-hidden">
-      {/* Subtle Ambient Corner Vignettes */}
+      {/* Ambient Radial Vignettes */}
       <div
         className="pointer-events-none fixed inset-0 z-0"
         style={{
@@ -112,8 +118,8 @@ export default function App() {
         }}
       />
 
-      {/* Top HUD Telemetry Navigation Bar (inspired by video_1.mp4 top section breadcrumb) */}
-      <header className="relative z-30 w-full px-6 md:px-14 pt-3.5 pb-2 flex items-center justify-between border-b border-white/[0.07] bg-[#070D0E]/80 backdrop-blur-md">
+      {/* Top HUD Telemetry Navigation Bar */}
+      <header className="relative z-30 w-full px-6 md:px-14 pt-3 pb-2 flex items-center justify-between border-b border-white/[0.07] bg-[#070D0E]/90">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-[11px] font-tech tracking-[0.18em] text-amberGold uppercase">
             <span className="w-2 h-2 rounded-full bg-amberGold animate-pulse" />
@@ -133,7 +139,7 @@ export default function App() {
               <button
                 key={s.id}
                 onClick={() => navigateTo(s.id)}
-                className={`px-2 py-1 rounded text-[10px] font-tech transition-all ${
+                className={`px-2 py-1 rounded text-[10px] font-tech transition-colors ${
                   active
                     ? 'bg-amberGold/20 text-amberGlow border border-amberGold/45 font-semibold'
                     : 'text-slate-500 hover:text-slate-300'
@@ -145,7 +151,7 @@ export default function App() {
           })}
         </nav>
 
-        {/* Right Controls: Slide Counter + Fullscreen */}
+        {/* Right Controls */}
         <div className="flex items-center gap-3">
           <span className="font-tech text-xs text-slate-300">
             <span className="text-amberGlow font-semibold">
@@ -162,7 +168,7 @@ export default function App() {
           </button>
         </div>
 
-        {/* Continuous Amber Progress Line */}
+        {/* Progress Bar */}
         <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-white/[0.06]">
           <div
             className="h-full bg-gradient-to-r from-amberGold via-amberGlow to-crimsonClade transition-all duration-500 ease-out"
@@ -171,33 +177,30 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Slide Stage with Authentic Animated Transition Curtain */}
+      {/* Main Slide Stage */}
       <main className="relative z-10 flex-1 w-full overflow-hidden flex items-center justify-center">
-        {/* Laser Vertical Curtain Wipe Overlay (active during slide transitions except Slide 0->1 zoom) */}
-        {isTransitioning && !heroZoomBurst && (
-          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center">
+        {/* TV Vertical Line Expand -> Full Curtain -> Collapse Transition Overlay (60fps GPU scale3d) */}
+        {curtainPhase !== 'idle' && (
+          <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center overflow-hidden">
+            {/* Expanding / Collapsing Dark Teal Shutter */}
             <div
-              className="w-full h-full bg-[#070D0E]/85 backdrop-blur-sm transition-opacity duration-300"
-              style={{ opacity: 0.92 }}
+              className={`absolute inset-0 bg-[#081214] border-x-2 border-amberGlow shadow-[0_0_50px_rgba(232,155,60,0.45)] ${
+                curtainPhase === 'expand' ? 'tv-shutter-expand' : 'tv-shutter-collapse'
+              }`}
+              style={{ transformOrigin: 'center center' }}
             />
+            {/* Glowing Central Vertical CRT Scan Beam */}
             <div
-              className="absolute top-0 bottom-0 w-[2px] bg-amberGlow shadow-[0_0_24px_#F6BA66]"
-              style={{
-                left: transitionDirection === 'next' ? '50%' : '50%',
-                transition: 'all 320ms ease-out',
-              }}
+              className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-[3px] bg-amberGlow shadow-[0_0_28px_4px_rgba(246,186,102,0.9)] tv-core-beam"
+              style={{ transformOrigin: 'center center' }}
             />
           </div>
         )}
 
-        {/* Active Slide Content Container */}
+        {/* Active Slide Content Container with 60fps smooth entry */}
         <div
           key={currentSlide}
-          className={`w-full h-full max-w-[1440px] mx-auto transition-all duration-500 ease-out ${
-            isTransitioning && !heroZoomBurst
-              ? 'opacity-0 scale-[0.985] translate-y-1'
-              : 'opacity-100 scale-100 translate-y-0'
-          }`}
+          className="w-full h-full max-w-[1440px] mx-auto animate-slide-enter"
         >
           {currentSlide === 0 && <Slide1Title onNext={handleNext} zoomBurst={heroZoomBurst} />}
           {currentSlide === 1 && <Slide2Problematic />}
@@ -212,8 +215,8 @@ export default function App() {
         </div>
       </main>
 
-      {/* Bottom HUD Navigation Bar (mirrors video_1.mp4 bottom corner controls) */}
-      <footer className="relative z-30 w-full px-6 md:px-14 py-2.5 border-t border-white/[0.07] bg-[#070D0E]/85 backdrop-blur-md flex items-center justify-between text-[11px] font-tech text-slate-400">
+      {/* Bottom HUD Navigation Bar */}
+      <footer className="relative z-30 w-full px-6 md:px-14 py-2.5 border-t border-white/[0.07] bg-[#070D0E]/90 flex items-center justify-between text-[11px] font-tech text-slate-400">
         <div className="flex items-center gap-2 truncate">
           <span className="text-amberGold">MELNYK ET AL. (2026)</span>
           <span className="hidden sm:inline">·</span>
@@ -225,16 +228,16 @@ export default function App() {
         <div className="flex items-center gap-2">
           <button
             onClick={handlePrev}
-            disabled={currentSlide === 0}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded border border-white/15 bg-white/[0.03] text-slate-200 hover:border-amberGold/50 hover:text-amberGlow disabled:opacity-30 disabled:pointer-events-none transition-all"
+            disabled={currentSlide === 0 || isBusy}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded border border-white/15 bg-white/[0.03] text-slate-200 hover:border-amberGold/50 hover:text-amberGlow disabled:opacity-30 disabled:pointer-events-none transition-colors"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             <span>НАЗАД</span>
           </button>
           <button
             onClick={handleNext}
-            disabled={currentSlide === SLIDES.length - 1}
-            className="inline-flex items-center gap-1 px-3 py-1 rounded border border-amberGold/40 bg-amberGold/15 text-amberGlow hover:bg-amberGold/25 disabled:opacity-30 disabled:pointer-events-none transition-all"
+            disabled={currentSlide === SLIDES.length - 1 || isBusy}
+            className="inline-flex items-center gap-1 px-3 py-1 rounded border border-amberGold/40 bg-amberGold/15 text-amberGlow hover:bg-amberGold/25 disabled:opacity-30 disabled:pointer-events-none transition-colors"
           >
             <span>ДАЛІ</span>
             <ChevronRight className="w-3.5 h-3.5" />

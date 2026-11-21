@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Compass, GitMerge, ShieldAlert, Sparkles } from 'lucide-react';
+import { CheckCircle2, GitMerge, ShieldAlert, Sparkles } from 'lucide-react';
 
 export const Slide8DiscussionConclusions: React.FC = () => {
   const conclusions = [
@@ -30,9 +30,8 @@ export const Slide8DiscussionConclusions: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-6">
-      {/* Header */}
-      <div className="space-y-1.5">
+    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-5 gap-3">
+      <div className="space-y-1">
         <div className="flex items-center gap-2 text-[11px] font-tech uppercase tracking-[0.2em] text-amberGold">
           <GitMerge className="w-3.5 h-3.5" />
           <span>ОБГОВОРЕННЯ ТА ВИСНОВКИ</span>
@@ -42,8 +41,8 @@ export const Slide8DiscussionConclusions: React.FC = () => {
         </h2>
       </div>
 
-      {/* 4 Structured Conclusion Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-2 flex-1 max-h-[340px]">
+      {/* 4 Structured Conclusion Cards filling the vertical grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex-1">
         {conclusions.map((item) => (
           <div
             key={item.num}
@@ -67,7 +66,7 @@ export const Slide8DiscussionConclusions: React.FC = () => {
       </div>
 
       {/* Bottom Synthesis Banner */}
-      <div className="telemetry-card telemetry-card-active rounded-xl px-5 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div className="telemetry-card telemetry-card-active rounded-xl px-5 py-3 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <Sparkles className="w-5 h-5 text-amberGlow shrink-0" />
           <p className="text-xs sm:text-sm text-slate-200">

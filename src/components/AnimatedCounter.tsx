@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 interface AnimatedCounterProps {
   target: number;
@@ -9,41 +9,42 @@ interface AnimatedCounterProps {
   className?: string;
 }
 
+// Direct DOM textContent updates inside requestAnimationFrame for locked 60fps without React re-render overhead
 export const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   target,
   decimals = 0,
-  duration = 1100,
+  duration = 950,
   prefix = '',
   suffix = '',
   className = '',
 }) => {
-  const [current, setCurrent] = useState(0);
+  const spanRef = useRef<HTMLSpanElement | null>(null);
 
   useEffect(() => {
     let startTime: number | null = null;
-    let animationFrame: number;
+    let rafId: number;
 
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Cubic ease-out
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCurrent(eased * target);
+      const val = (eased * target).toFixed(decimals);
+      if (spanRef.current) {
+        spanRef.current.textContent = `${prefix}${val}${suffix}`;
+      }
       if (progress < 1) {
-        animationFrame = requestAnimationFrame(step);
-      } else {
-        setCurrent(target);
+        rafId = requestAnimationFrame(step);
       }
     };
 
-    animationFrame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(animationFrame);
-  }, [target, duration]);
+    rafId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(rafId);
+  }, [target, decimals, duration, prefix, suffix]);
 
   return (
-    <span className={`font-tech tabular-nums ${className}`}>
+    <span ref={spanRef} className={`font-tech tabular-nums ${className}`}>
       {prefix}
-      {current.toFixed(decimals)}
+      {(0).toFixed(decimals)}
       {suffix}
     </span>
   );

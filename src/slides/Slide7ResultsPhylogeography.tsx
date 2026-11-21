@@ -9,15 +9,14 @@ export const Slide7ResultsPhylogeography: React.FC = () => {
   const activeGroup = HAPLOGROUPS.find((g) => g.id === selectedLayer);
 
   return (
-    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-6">
-      {/* Header */}
+    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-5 gap-3">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <div className="flex items-center gap-2 text-[11px] font-tech uppercase tracking-[0.2em] text-amberGold">
             <Compass className="w-3.5 h-3.5" />
             <span>РЕЗУЛЬТАТИ · ЧАСТИНА III: ФІЛОГЕОГРАФІЯ ТА ЛЬОДОВИКОВІ РЕФУГІУМИ</span>
           </div>
-          <h2 className="font-editorial text-3xl sm:text-4xl font-semibold text-white mt-1">
+          <h2 className="font-editorial text-3xl sm:text-4xl font-semibold text-white mt-0.5">
             Плейстоценові рефугіуми та голоценові шляхи розселення в Європі
           </h2>
         </div>
@@ -26,14 +25,11 @@ export const Slide7ResultsPhylogeography: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Split: Interactive Map (7 cols) + Glacial Refugia Reconstruction Cards (5 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch flex-1 my-2 max-h-[415px]">
-        {/* Left: Interactive SVG Phylogeography Map with Laser Scan */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch flex-1">
         <div className="lg:col-span-7 h-full">
           <EuropePhylogeoMap selectedId={selectedLayer} onSelect={setSelectedLayer} />
         </div>
 
-        {/* Right: Refugia & Postglacial Routes Details */}
         <div className="lg:col-span-5 flex flex-col justify-between space-y-2.5 overflow-y-auto pr-1">
           {selectedLayer === 'SENNII' ? (
             <div className="telemetry-card telemetry-card-active rounded-xl p-5 flex-1 flex flex-col justify-between border border-crimsonClade/50">

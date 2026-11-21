@@ -23,9 +23,10 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   overflow: hidden;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Custom subtle scrollbars for interactive panels if needed */
+/* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -38,26 +39,27 @@ body {
   border-radius: 2px;
 }
 
+/* 60fps GPU-composited animations (only transform & opacity) */
 @keyframes pulseSlow {
-  0%, 100% { opacity: 0.45; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.03); }
+  0%, 100% { opacity: 0.55; transform: scale3d(1, 1, 1); }
+  50% { opacity: 0.95; transform: scale3d(1.03, 1.03, 1); }
 }
 
 @keyframes rotateSlow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from { transform: rotate3d(0, 0, 1, 0deg); }
+  to { transform: rotate3d(0, 0, 1, 360deg); }
 }
 
 @keyframes rotateReverseSlow {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
+  from { transform: rotate3d(0, 0, 1, 360deg); }
+  to { transform: rotate3d(0, 0, 1, 0deg); }
 }
 
 @keyframes scanSweep {
-  0% { transform: translateX(-100%); opacity: 0; }
-  15% { opacity: 0.85; }
-  85% { opacity: 0.85; }
-  100% { transform: translateX(100vw); opacity: 0; }
+  0% { transform: translate3d(-120%, 0, 0); opacity: 0; }
+  12% { opacity: 0.9; }
+  88% { opacity: 0.9; }
+  100% { transform: translate3d(650%, 0, 0); opacity: 0; }
 }
 
 @keyframes dashFlow {
@@ -65,28 +67,113 @@ body {
 }
 
 @keyframes floatSubtle {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-6px); }
+  0%, 100% { transform: translate3d(0, 0px, 0); }
+  50% { transform: translate3d(0, -6px, 0); }
+}
+
+@keyframes slideContentEnter {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale3d(0.985, 0.985, 1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+}
+
+/* TV Vertical Beam Expand -> Full Curtain -> Collapse Transition (60fps scaleX on GPU) */
+@keyframes tvShutterExpand {
+  0% {
+    transform: scale3d(0.003, 0.15, 1);
+    opacity: 0.4;
+  }
+  22% {
+    transform: scale3d(0.004, 1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+}
+
+@keyframes tvShutterCollapse {
+  0% {
+    transform: scale3d(1, 1, 1);
+    opacity: 1;
+  }
+  78% {
+    transform: scale3d(0.004, 1, 1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale3d(0.002, 0, 1);
+    opacity: 0;
+  }
+}
+
+@keyframes tvCoreBeamGlow {
+  0% {
+    opacity: 0;
+    transform: scale3d(1, 0.1, 1);
+  }
+  20% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  80% {
+    opacity: 1;
+    transform: scale3d(1, 1, 1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale3d(1, 0.05, 1);
+  }
 }
 
 .animate-pulse-slow {
   animation: pulseSlow 4.5s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 
 .animate-spin-slow {
   animation: rotateSlow 42s linear infinite;
+  will-change: transform;
 }
 
 .animate-spin-reverse-slow {
   animation: rotateReverseSlow 58s linear infinite;
+  will-change: transform;
 }
 
 .animate-dash-flow {
-  animation: dashFlow 2.4s linear infinite;
+  animation: dashFlow 2.2s linear infinite;
 }
 
 .animate-float-subtle {
-  animation: floatSubtle 5s ease-in-out infinite;
+  animation: floatSubtle 4.8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-slide-enter {
+  animation: slideContentEnter 0.48s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.tv-shutter-expand {
+  animation: tvShutterExpand 0.32s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.tv-shutter-collapse {
+  animation: tvShutterCollapse 0.34s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  will-change: transform, opacity;
+}
+
+.tv-core-beam {
+  animation: tvCoreBeamGlow 0.66s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  will-change: transform, opacity;
 }
 
 /* Editorial typography helpers */
@@ -98,23 +185,22 @@ body {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Glass card with micro-grid border */
+/* Performance-tuned glass card (lighter blur radius for locked 60fps during animations) */
 .telemetry-card {
-  background: linear-gradient(145deg, rgba(16, 34, 38, 0.72) 0%, rgba(7, 13, 14, 0.88) 100%);
-  border: 1px solid rgba(232, 155, 60, 0.16);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
+  background: linear-gradient(145deg, rgba(16, 34, 38, 0.84) 0%, rgba(7, 13, 14, 0.94) 100%);
+  border: 1px solid rgba(232, 155, 60, 0.18);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .telemetry-card-active {
-  border-color: rgba(232, 155, 60, 0.45);
-  box-shadow: 0 0 30px rgba(232, 155, 60, 0.12), inset 0 1px 0 rgba(246, 186, 102, 0.12);
+  border-color: rgba(232, 155, 60, 0.48);
+  box-shadow: 0 0 28px rgba(232, 155, 60, 0.14), inset 0 1px 0 rgba(246, 186, 102, 0.12);
 }
 
 /* Coordinate grid overlay */
 .bg-radar-grid {
   background-size: 48px 48px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    linear-gradient(to right, rgba(255, 255, 255, 0.024) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.024) 1px, transparent 1px);
 }

@@ -9,15 +9,14 @@ interface Slide10Props {
 
 export const Slide10ThankYou: React.FC<Slide10Props> = ({ onRestart }) => {
   return (
-    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-center px-6 md:px-14 py-6">
-      {/* Left 7 Cols: Standard Thank You & Citation Block */}
-      <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
+    <div className="w-full h-full grid grid-cols-1 lg:grid-cols-12 gap-6 items-center px-6 md:px-14 py-5">
+      <div className="lg:col-span-7 flex flex-col justify-center space-y-5">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-amberGold/10 border border-amberGold/30 text-[11px] font-tech uppercase tracking-[0.2em] text-amberGold w-fit">
           <Award className="w-3.5 h-3.5" />
           <span>ЗАВЕРШЕННЯ ДОПОВІДІ</span>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <h2 className="font-editorial text-5xl sm:text-6xl font-semibold text-white leading-none">
             Дякую за увагу!
           </h2>
@@ -28,7 +27,6 @@ export const Slide10ThankYou: React.FC<Slide10Props> = ({ onRestart }) => {
           </p>
         </div>
 
-        {/* Full Recommended Citation Card */}
         <div className="telemetry-card rounded-xl p-5 space-y-3 max-w-2xl border-l-4 border-l-amberGold">
           <div className="text-[10px] font-tech uppercase tracking-widest text-amberGold">
             ЦИТУВАННЯ ОРИГІНАЛЬНОЇ ПУБЛІКАЦІЇ
@@ -57,7 +55,6 @@ export const Slide10ThankYou: React.FC<Slide10Props> = ({ onRestart }) => {
           </div>
         </div>
 
-        {/* Restart Presentation Button */}
         <div>
           <button
             onClick={onRestart}
@@ -69,8 +66,7 @@ export const Slide10ThankYou: React.FC<Slide10Props> = ({ onRestart }) => {
         </div>
       </div>
 
-      {/* Right 5 Cols: Subtle Ambient Beetle Radar Emblem */}
-      <div className="lg:col-span-5 h-[320px] lg:h-[420px] flex items-center justify-center opacity-90">
+      <div className="lg:col-span-5 h-[320px] lg:h-[420px] flex items-center justify-center opacity-95">
         <BeetleHeroVisualizer />
       </div>
     </div>

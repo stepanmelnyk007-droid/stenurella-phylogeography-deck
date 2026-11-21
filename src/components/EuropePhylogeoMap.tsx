@@ -7,13 +7,11 @@ interface EuropePhylogeoMapProps {
 }
 
 export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId, onSelect }) => {
-  const [scanActive, setScanActive] = useState(true);
+  const [scanKey, setScanKey] = useState(0);
   const [hoveredPoint, setHoveredPoint] = useState<string | null>(null);
 
   useEffect(() => {
-    setScanActive(false);
-    const t = setTimeout(() => setScanActive(true), 40);
-    return () => clearTimeout(t);
+    setScanKey((k) => k + 1);
   }, [selectedId]);
 
   const visibleGroups: HaplogroupInfo[] =
@@ -27,7 +25,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
       <div className="flex items-center justify-between px-2 pb-2 border-b border-white/10 text-[11px] font-tech text-slate-400">
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-amberGold animate-pulse" />
-          <span>WGS 84 (EPSG:4326) · DIVA-GIS 7.5 / PHYLOGEOGRAPHIC OVERLAY</span>
+          <span>WGS 84 (EPSG:4326) · DIVA-GIS 7.5</span>
         </div>
         <span className="text-amberGlow">
           {selectedId === 'SENNII'
@@ -39,18 +37,17 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
       </div>
 
       {/* Main SVG Europe Schematic + Phylogeographic Vectors */}
-      <div className="relative flex-1 w-full min-h-[270px] flex items-center justify-center overflow-hidden">
-        {/* Laser sweep effect inspired by video_1.mp4 00:21-00:24 */}
-        {scanActive && (
-          <div
-            className="pointer-events-none absolute top-0 bottom-0 w-16 z-20"
-            style={{
-              background:
-                'linear-gradient(90deg, rgba(232,155,60,0) 0%, rgba(232,155,60,0.28) 85%, rgba(246,186,102,0.85) 100%)',
-              animation: 'scanSweep 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards',
-            }}
-          />
-        )}
+      <div className="relative flex-1 w-full min-h-[260px] flex items-center justify-center overflow-hidden">
+        {/* 60fps GPU Laser Sweep */}
+        <div
+          key={scanKey}
+          className="pointer-events-none absolute top-0 bottom-0 left-0 w-20 z-20 will-change-transform"
+          style={{
+            background:
+              'linear-gradient(90deg, rgba(232,155,60,0) 0%, rgba(232,155,60,0.28) 85%, rgba(246,186,102,0.88) 100%)',
+            animation: 'scanSweep 1.35s cubic-bezier(0.22, 1, 0.36, 1) forwards',
+          }}
+        />
 
         <svg viewBox="110 55 340 265" className="w-full h-full max-h-[340px]">
           <defs>
@@ -64,7 +61,6 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
             </radialGradient>
           </defs>
 
-          {/* Latitude / Longitude Graticule */}
           {[90, 140, 190, 240, 290].map((y) => (
             <line
               key={`lat-${y}`}
@@ -88,38 +84,26 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
             />
           ))}
 
-          {/* Stylized Vector Coastline of Western, Central, Northern & Eastern Europe */}
-          <g fill="#0E1D21" stroke="rgba(148, 163, 184, 0.28)" strokeWidth="1.1" strokeLinejoin="round">
-            {/* Iberian Peninsula */}
+          {/* Europe Coastlines */}
+          <g fill="#0E1D21" stroke="rgba(148, 163, 184, 0.30)" strokeWidth="1.1" strokeLinejoin="round">
             <path d="M 142 262 L 185 256 L 204 268 L 195 294 L 160 304 L 138 292 Z" />
-            {/* France & Benelux */}
             <path d="M 185 256 L 192 214 L 222 198 L 248 192 L 258 228 L 246 258 L 204 268 Z" />
-            {/* Great Britain & Ireland */}
             <path d="M 186 142 L 206 138 L 214 176 L 188 182 Z" />
             <path d="M 166 154 L 180 152 L 180 172 L 165 172 Z" />
-            {/* Italy */}
             <path d="M 258 228 L 284 234 L 308 276 L 296 286 L 274 252 Z" />
-            {/* Central Europe (Germany, Poland, Czechia, Austria, Alps) */}
             <path d="M 248 192 L 278 164 L 348 156 L 366 184 L 336 212 L 284 226 L 258 228 Z" />
-            {/* Balkans & Carpathian Basin */}
             <path d="M 312 214 L 356 208 L 372 246 L 346 282 L 320 264 L 306 232 Z" />
-            {/* Fennoscandia (Norway, Sweden, Finland) */}
             <path d="M 284 126 L 308 74 L 356 68 L 388 86 L 384 128 L 354 134 L 336 112 L 314 142 L 288 138 Z" />
-            {/* Baltic, Ukraine & Eastern European Plain */}
             <path d="M 348 156 L 368 132 L 436 122 L 442 224 L 392 232 L 356 208 L 366 184 Z" />
           </g>
 
-          {/* Mountain System Contours (Pyrenees, Alps, Carpathians) */}
-          <g fill="none" stroke="rgba(232, 155, 60, 0.22)" strokeWidth="1.2" strokeDasharray="3 3">
-            {/* Pyrenees */}
+          {/* Mountain Systems */}
+          <g fill="none" stroke="rgba(232, 155, 60, 0.24)" strokeWidth="1.2" strokeDasharray="3 3">
             <path d="M 184 262 Q 204 266 222 264" />
-            {/* Alps */}
             <path d="M 252 224 Q 282 212 314 218" />
-            {/* Carpathian Arc */}
             <path d="M 346 196 Q 378 194 388 218 Q 378 232 362 230" />
           </g>
 
-          {/* Postglacial Expansion Vectors (Animated dashed arrows) */}
           {(selectedId === 'ALL' || selectedId === 'Sm1') && (
             <g>
               <circle cx="236" cy="256" r="24" fill="url(#refugiumGlow)" />
@@ -130,7 +114,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                 strokeWidth="1.6"
                 strokeDasharray="5 5"
                 className="animate-dash-flow"
-                opacity="0.75"
+                opacity="0.78"
               />
               <path
                 d="M 236 254 Q 265 175 344 108"
@@ -139,7 +123,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                 strokeWidth="1.4"
                 strokeDasharray="5 5"
                 className="animate-dash-flow"
-                opacity="0.65"
+                opacity="0.68"
               />
             </g>
           )}
@@ -154,7 +138,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                 strokeWidth="1.6"
                 strokeDasharray="5 5"
                 className="animate-dash-flow"
-                opacity="0.8"
+                opacity="0.82"
               />
               <path
                 d="M 426 148 Q 355 178 286 214"
@@ -163,7 +147,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                 strokeWidth="1.4"
                 strokeDasharray="5 5"
                 className="animate-dash-flow"
-                opacity="0.7"
+                opacity="0.72"
               />
             </g>
           )}
@@ -183,13 +167,12 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
             </g>
           )}
 
-          {/* Plot haplogroup occurrence points */}
           {selectedId !== 'SENNII' &&
             visibleGroups.map((group) =>
               group.points.map((pt, idx) => (
                 <g
                   key={`${group.id}-${idx}`}
-                  className="cursor-pointer transition-transform duration-200 hover:scale-125"
+                  className="cursor-pointer"
                   onMouseEnter={() => setHoveredPoint(`${group.id}: ${pt.label}`)}
                   onMouseLeave={() => setHoveredPoint(null)}
                 >
@@ -207,7 +190,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                   <circle
                     cx={pt.x}
                     cy={pt.y}
-                    r={pt.isHybrid ? '3.6' : '4.1'}
+                    r={pt.isHybrid ? '3.8' : '4.2'}
                     fill={group.color}
                     stroke="#070D0E"
                     strokeWidth="1"
@@ -216,7 +199,6 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
               ))
             )}
 
-          {/* Stenurella sennii nom. res. Confirmed Localities in Central France */}
           {(selectedId === 'ALL' || selectedId === 'SENNII') && (
             <g
               className="cursor-pointer"
@@ -226,10 +208,8 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
               onMouseLeave={() => setHoveredPoint(null)}
             >
               <circle cx="222" cy="224" r="24" fill="url(#senniiGlow)" />
-              {/* PSFOR1138-17 */}
               <circle cx="212" cy="214" r="8" fill="none" stroke="#E64833" strokeWidth="1.2" className="animate-ping" />
               <circle cx="212" cy="214" r="4.8" fill="#E64833" stroke="#FFFFFF" strokeWidth="1.2" />
-              {/* PSFOR160-13 */}
               <circle cx="228" cy="233" r="4.8" fill="#E64833" stroke="#FFFFFF" strokeWidth="1.2" />
               {selectedId === 'SENNII' && (
                 <g transform="translate(242, 206)">
@@ -239,7 +219,7 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
                     width="148"
                     height="36"
                     rx="4"
-                    fill="rgba(7,13,14,0.9)"
+                    fill="rgba(7,13,14,0.92)"
                     stroke="#E64833"
                     strokeWidth="1"
                   />
@@ -255,11 +235,10 @@ export const EuropePhylogeoMap: React.FC<EuropePhylogeoMapProps> = ({ selectedId
           )}
         </svg>
 
-        {/* Floating Tooltip for hovered geographic point */}
         {hoveredPoint && (
           <div className="absolute bottom-2 left-3 right-3 px-3 py-1.5 rounded bg-[#070D0E]/95 border border-amberGold/40 text-xs text-amberGlow font-tech flex items-center justify-between z-30">
             <span>{hoveredPoint}</span>
-            <span className="text-[10px] text-slate-400">COI BARCODE VOUCHER</span>
+            <span className="text-[10px] text-slate-400">COI VOUCHER</span>
           </div>
         )}
       </div>

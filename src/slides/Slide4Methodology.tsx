@@ -68,9 +68,8 @@ export const Slide4Methodology: React.FC = () => {
   ];
 
   return (
-    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-6">
-      {/* Header */}
-      <div className="space-y-1.5">
+    <div className="w-full h-full flex flex-col justify-between px-6 md:px-14 py-5 gap-3">
+      <div className="space-y-1">
         <div className="flex items-center gap-2 text-[11px] font-tech uppercase tracking-[0.2em] text-amberGold">
           <FlaskConical className="w-3.5 h-3.5" />
           <span>МАТЕРІАЛИ ТА МЕТОДОЛОГІЯ ДОСЛІДЖЕННЯ</span>
@@ -80,8 +79,8 @@ export const Slide4Methodology: React.FC = () => {
         </h2>
       </div>
 
-      {/* Horizontal Interactive Pipeline Flow (mirrors the nerve-to-brain transmission schematic in video_1.mp4 00:10) */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 my-2">
+      {/* Horizontal Interactive Pipeline Flow */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
         {steps.map((s, idx) => {
           const Icon = s.icon;
           const active = activeStep === idx;
@@ -89,7 +88,7 @@ export const Slide4Methodology: React.FC = () => {
             <button
               key={s.step}
               onClick={() => setActiveStep(idx)}
-              className={`relative p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[104px] ${
+              className={`relative p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[88px] ${
                 active
                   ? 'bg-[#102226] border-amberGold shadow-[0_0_20px_rgba(232,155,60,0.18)] -translate-y-0.5'
                   : 'bg-white/[0.02] border-white/10 hover:border-white/25 opacity-80'
@@ -101,7 +100,7 @@ export const Slide4Methodology: React.FC = () => {
                 </span>
                 <Icon className="w-4 h-4" style={{ color: s.color }} />
               </div>
-              <div className="text-xs sm:text-[13px] font-semibold text-white leading-tight mt-2">
+              <div className="text-xs sm:text-[13px] font-semibold text-white leading-tight mt-1.5">
                 {s.title}
               </div>
               {idx < steps.length - 1 && (
@@ -112,28 +111,26 @@ export const Slide4Methodology: React.FC = () => {
         })}
       </div>
 
-      {/* Active Step Detailed Telemetry Card + Dataset Summary Bar */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch flex-1 max-h-[285px]">
-        <div className="lg:col-span-8 telemetry-card telemetry-card-active rounded-xl p-5 flex flex-col justify-between">
+      {/* Active Step Detailed Card + PCR Thermocycling Graphic + Sample Composition */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch flex-1">
+        <div className="lg:col-span-8 telemetry-card telemetry-card-active rounded-xl p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3">
-              <div>
-                <span
-                  className="text-xs font-tech font-semibold uppercase tracking-wider"
-                  style={{ color: steps[activeStep].color }}
-                >
-                  {steps[activeStep].step} · {steps[activeStep].subtitle}
-                </span>
-                <h3 className="font-editorial text-2xl font-semibold text-white mt-0.5">
-                  {steps[activeStep].title}
-                </h3>
-              </div>
+            <div className="border-b border-white/10 pb-2 mb-2.5">
+              <span
+                className="text-xs font-tech font-semibold uppercase tracking-wider"
+                style={{ color: steps[activeStep].color }}
+              >
+                {steps[activeStep].step} · {steps[activeStep].subtitle}
+              </span>
+              <h3 className="font-editorial text-2xl font-semibold text-white mt-0.5">
+                {steps[activeStep].title}
+              </h3>
             </div>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2">
               {steps[activeStep].specs.map((item, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-slate-200 leading-relaxed">
+                <li key={i} className="flex items-start gap-2.5 text-xs sm:text-[13px] text-slate-200 leading-relaxed">
                   <span
-                    className="w-1.5 h-1.5 rounded-full mt-2 shrink-0"
+                    className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
                     style={{ backgroundColor: steps[activeStep].color }}
                   />
                   <span>{item}</span>
@@ -141,13 +138,31 @@ export const Slide4Methodology: React.FC = () => {
               ))}
             </ul>
           </div>
-          <div className="text-[11px] font-tech text-slate-400 pt-2 border-t border-white/10">
-            Натисніть на будь-який етап пайплайну вгорі, щоб переглянути лабораторні параметри
+
+          {/* PCR Thermocycler Profile SVG Visualization */}
+          <div className="mt-2 pt-2 border-t border-white/10">
+            <div className="flex items-center justify-between text-[10px] font-tech text-slate-400 mb-1">
+              <span>ТЕРМОПРОФІЛЬ ПЛР АМПЛІФІКАЦІЇ COI (HCO / LCO · 25–35 ЦИКЛІВ)</span>
+              <span className="text-cyanHaplotype">10 мкл реакція + DMSO</span>
+            </div>
+            <svg viewBox="0 0 540 54" className="w-full h-[46px]">
+              <polyline
+                points="10,12 75,12 75,12 140,12 175,44 235,44 265,24 335,24 365,12 430,12 465,24 530,24"
+                fill="none"
+                stroke="#38BDF8"
+                strokeWidth="1.8"
+              />
+              <text x="42" y="9" textAnchor="middle" fill="#F87171" fontSize="8" fontFamily="JetBrains Mono, monospace">95°C 2хв</text>
+              <text x="108" y="9" textAnchor="middle" fill="#F87171" fontSize="8" fontFamily="JetBrains Mono, monospace">95°C 30с</text>
+              <text x="205" y="52" textAnchor="middle" fill="#34D399" fontSize="8" fontFamily="JetBrains Mono, monospace">40°C 30с (відпал)</text>
+              <text x="300" y="20" textAnchor="middle" fill="#F6BA66" fontSize="8" fontFamily="JetBrains Mono, monospace">72°C 45с</text>
+              <text x="498" y="20" textAnchor="middle" fill="#F6BA66" fontSize="8" fontFamily="JetBrains Mono, monospace">72°C 5хв</text>
+            </svg>
           </div>
         </div>
 
-        {/* Right: Sample Composition Breakdown (250 total sequences) */}
-        <div className="lg:col-span-4 telemetry-card rounded-xl p-5 flex flex-col justify-between">
+        {/* Right: Sample Composition Breakdown */}
+        <div className="lg:col-span-4 telemetry-card rounded-xl p-4 flex flex-col justify-between">
           <div className="text-[11px] font-tech uppercase tracking-wider text-amberGold">
             СТРУКТУРА ВИБІРКИ (N = 250)
           </div>
@@ -168,7 +183,7 @@ export const Slide4Methodology: React.FC = () => {
                 <span className="font-tech text-crimsonClade">2 (0.8%)</span>
               </div>
               <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-crimsonClade rounded-full" style={{ width: '4%' }} />
+                <div className="h-full bg-crimsonClade rounded-full" style={{ width: '5%' }} />
               </div>
             </div>
 
@@ -181,12 +196,12 @@ export const Slide4Methodology: React.FC = () => {
                 <span className="font-tech text-amberGold">7 (2.8%)</span>
               </div>
               <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-full bg-amberGold rounded-full" style={{ width: '7%' }} />
+                <div className="h-full bg-amberGold rounded-full" style={{ width: '8%' }} />
               </div>
             </div>
           </div>
 
-          <div className="text-[11px] text-slate-400 leading-snug border-t border-white/10 pt-2.5">
+          <div className="text-[11px] text-slate-400 leading-snug border-t border-white/10 pt-2">
             Джерела даних: власні сиквенси з України (GenBank PV658013 та ін.) + валідовані записи
             BOLD Systems (BS) та GenBank (GB).
           </div>
